@@ -1,0 +1,5 @@
+# ignore these types of file
+HW2/FeatureSelection/cache/
+HW2/FeatureSelection/input/
+HW2/FeatureSelection/output/
+*.model

@@ -51,6 +51,10 @@ public class TrainAndTestByLibSVM {
         	int indexTrain = this.str_trained.length - 1;
         	this.str_trained[indexTrain] = train;
             str_model = svm_train.main(str_trained);  
+          //测试返回的是准确率，可以看出要求改svm_predict.java  
+        	str_result[1] = str_model;   
+        	str_result[0] = train;
+            double accuracy = svm_predict.main(str_result );           
         } catch (IOException e) {  
             // TODO Auto-generated catch block  
             e.printStackTrace();  
@@ -94,10 +98,11 @@ public class TrainAndTestByLibSVM {
     }  
   
     public static void main(String[] args){  
+    	FileIO.main(null);
         TrainAndTestByLibSVM tat = TrainAndTestByLibSVM.getInstance();  
         System.out.println("正在训练分类模型。。。。");  
-        tat.trainByLibSVM(tat.trainTxt);  
+        tat.trainByLibSVM(FileIO.trainExport);  
         System.out.println("正在应用分类模型进行分类。。。。");  
-        tat.tellByLibSVM(tat.testTxt);  
+        tat.tellByLibSVM(FileIO.testExport);  
     }  
 }  
