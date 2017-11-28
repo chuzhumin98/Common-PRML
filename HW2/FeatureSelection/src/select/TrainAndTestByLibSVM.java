@@ -98,6 +98,12 @@ public class TrainAndTestByLibSVM {
     }  
   
     public static void main(String[] args){  
+    	FileIO tmp = FileIO.getInstance();
+    	for (int i = 0; i < 10; i++) {
+    		if (i != 5 && i != 4) {
+    			tmp.beUsed.set(i, false);
+    		}
+    	}
     	FileIO.main(null);
         TrainAndTestByLibSVM tat = TrainAndTestByLibSVM.getInstance();  
         System.out.println("正在训练分类模型。。。。");  

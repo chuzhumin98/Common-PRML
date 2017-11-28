@@ -24,6 +24,7 @@ public class FileIO {
 		for (int i = 0; i < 10; i++) {
 			beUsed.add(true);
 		}
+		this.readFile();
 	}
 	
 	static FileIO getInstance() {
@@ -125,7 +126,6 @@ public class FileIO {
 	
 	public static void main(String[] args) {
 		FileIO fio = FileIO.getInstance();
-		fio.readFile();
 		fio.writeAttriForSVM();
 	}
 	
