@@ -116,10 +116,11 @@ public class svm_predict {
 				 ((total*sumvv-sumv*sumv)*(total*sumyy-sumy*sumy))+
 				 " (regression)\n");
 		}
-		else
+		else {
 			svm_predict.info("Accuracy = "+(double)correct/total*100+
 				 "% ("+correct+"/"+total+") (classification)\n");
-			svm_predict.accuracy = (double) (correct / total);
+			svm_predict.accuracy = (double) ((double)correct / total);
+		}
 	}
 
 	private static void exit_with_help()
