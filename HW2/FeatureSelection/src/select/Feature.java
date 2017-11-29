@@ -1,5 +1,8 @@
 package select;
 
+import java.util.ArrayList;
+
+import Jama.Matrix;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -135,7 +138,55 @@ public class Feature {
 		return J4;
 	}
 	
+	public static Matrix getForSigma(int index) { //index为0或1
+		int size = FileIO.countUsed();
+		Matrix mtmp = Matrix.identity(size, size);
+		ArrayList<Integer> useIndex = new ArrayList<Integer>();
+		for (int i = 0; i < attriNum; i++) {
+			if (FileIO.fileIO.beUsed.get(i)) {
+				useIndex.add(i);
+			}
+		}
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				mtmp.set(i, j, feature[index].sigma[useIndex.get(i)][useIndex.get(j)]);
+			}
+		}
+		return mtmp;
+	}
+	
+	public static Matrix getForMuMinus() { //mu1-mu2
+		int size = FileIO.countUsed();
+		Matrix mtmp = Matrix.identity(size, 1);
+		ArrayList<Integer> useIndex = new ArrayList<Integer>();
+		for (int i = 0; i < attriNum; i++) {
+			if (FileIO.fileIO.beUsed.get(i)) {
+				useIndex.add(i);
+			}
+		}
+		for (int i = 0; i < size; i++) {
+			mtmp.set(i, 0, feature[0].mu[i] - feature[1].mu[i]);
+		}
+		return mtmp;
+	}
+	
+	public static double getJD() { //获取概率分布的散度
+		Matrix sigma0 = getForSigma(0);
+		Matrix sigma1 = getForSigma(1);
+		Matrix sigma0ni = sigma0.inverse();
+		Matrix sigma1ni = sigma1.inverse();
+		Matrix I2 = Matrix.identity(attriNum, attriNum).times(2.0);
+		Matrix muMinus = getForMuMinus();
+		Matrix part1 = (sigma0ni.times(sigma1)).plus(sigma1ni.times(sigma0)).minus(I2);
+		Matrix part2 = (muMinus.transpose()).times(sigma0ni.plus(sigma1ni)).times(muMinus);
+		double total = 0.5 * (part1.trace() + part2.get(0, 0));
+		return total;
+		
+	}
+	
+	
 	public static void main(String[] args) {
 		System.out.println("J4:"+Feature.getJ4());
+		System.out.println("JD:"+Feature.getJD());
 	}
 }

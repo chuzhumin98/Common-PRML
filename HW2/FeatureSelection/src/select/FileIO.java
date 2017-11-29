@@ -12,6 +12,7 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class FileIO {
+	public static final int attriNum = 10;
 	public static String trainExport = "cache/dataset3mysvm.txt";
 	public static String testExport = "cache/dataset4mysvm.txt";
 	public static String trainTxt = "input/dataset3svm.txt";
@@ -21,7 +22,7 @@ public class FileIO {
 	public ArrayList<Boolean> beUsed = new ArrayList<Boolean>();
 	public static FileIO fileIO = null;
 	FileIO() {
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < attriNum; i++) {
 			beUsed.add(true);
 		}
 		this.readFile();
@@ -32,6 +33,19 @@ public class FileIO {
 			fileIO = new FileIO();
 		}
 		return fileIO;
+	}
+	
+	public static int countUsed() {
+		if (fileIO == null) {
+			fileIO = new FileIO();
+		}
+		int counts = 0;
+		for (Boolean item: fileIO.beUsed) {
+			if (item) {
+				counts++;
+			}
+		}
+		return counts;
 	}
 	
 	public void readFile() {
@@ -93,7 +107,7 @@ public class FileIO {
 			PrintStream out = new PrintStream(new File(this.trainExport));
 			for (int i = 0; i < this.trainData.size(); i++) {
 				out.print(this.trainData.get(i).getInt("label")+" ");
-				for (int j = 0; j < 10; j++) {
+				for (int j = 0; j < attriNum; j++) {
 					if (this.beUsed.get(j)) {
 						out.print(j+":"+this.trainData.get(i).getJSONArray("attri").getDouble(j)+" ");
 					}
@@ -111,7 +125,7 @@ public class FileIO {
 			PrintStream out = new PrintStream(new File(this.testExport));
 			for (int i = 0; i < this.testData.size(); i++) {
 				out.print(this.testData.get(i).getInt("label")+" ");
-				for (int j = 0; j < 10; j++) {
+				for (int j = 0; j < attriNum; j++) {
 					if (this.beUsed.get(j)) {
 						out.print(j+":"+this.testData.get(i).getJSONArray("attri").getDouble(j)+" ");
 					}
