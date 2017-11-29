@@ -188,9 +188,48 @@ public class SelectMethod {
 		TrainAndTestByLibSVM.main(null);	
 	}
 	
+	/*
+	 * 顺序前进法，次优算法
+	 */
+	public void forwardSelection(int standard) {
+		ArrayList<Integer> candidate = new ArrayList<Integer>();
+		for (int i = 0; i < FileIO.attriNum; i++) {
+			candidate.add(i);
+		}
+		int[] maxAttri = new int [3];
+		FileIO fio = FileIO.getInstance();
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			int maxIndex = 0;
+			double maxScore = Double.MIN_VALUE;
+			for (int j = 0; j < candidate.size(); j++) {
+				fio.beUsed.set(candidate.get(j), true);
+				double score = this.getScore(standard);
+				if (score > maxScore) {
+					maxIndex = j;
+					maxScore = score;
+				}
+				fio.beUsed.set(candidate.get(j), false);
+			}
+			fio.beUsed.set(candidate.get(maxIndex), true);
+			maxAttri[i] = candidate.get(maxIndex);
+			candidate.remove(maxIndex);
+		}
+		
+		System.out.println("the max pairs using tanxinMethod is:"+
+				maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
+		//设置为最佳组合
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(maxAttri[i], true);
+		} 
+		TrainAndTestByLibSVM.main(null);	
+	}
+	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
 		sm1.tanXinMethod(0);
+		sm1.forwardSelection(0);
 	}
 	
 	class MaxInfo {
