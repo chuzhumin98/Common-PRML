@@ -93,18 +93,13 @@ public class TrainAndTestByLibSVM {
             // TODO Auto-generated catch block  
             e.printStackTrace();  
         }  
-        System.out.println("accuracy:"+accuracy);
+        //System.out.println("accuracy:"+accuracy);
         return accuracy;  
     }  
   
     public static void main(String[] args){  
     	FileIO tmp = FileIO.getInstance();
-    	for (int i = 0; i < 10; i++) {
-    		if (i != 5 && i != 4) {
-    			tmp.beUsed.set(i, false);
-    		}
-    	}
-    	FileIO.main(null);
+    	tmp.writeAttriForSVM();
         TrainAndTestByLibSVM tat = TrainAndTestByLibSVM.getInstance();  
         System.out.println("正在训练分类模型。。。。");  
         tat.trainByLibSVM(FileIO.trainExport);  

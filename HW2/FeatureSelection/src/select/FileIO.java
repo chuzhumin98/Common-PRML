@@ -48,6 +48,12 @@ public class FileIO {
 		return counts;
 	}
 	
+	public void setAllUsed(boolean what) {
+		for (int i = 0; i < attriNum; i++) {
+			this.beUsed.set(i, what);
+		}
+	}
+	
 	public void readFile() {
 		this.readTrainFile();
 		this.readTestFile();

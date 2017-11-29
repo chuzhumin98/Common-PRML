@@ -112,11 +112,6 @@ public class Feature {
 		
 		System.out.println("female:"+count[0]);
 		System.out.println("male:"+count[1]);
-		for (int i = 0; i < attriNum; i++) {
-			System.out.print(feature[0].mu[i]+" ");
-		}
-		System.out.println();
-		
 	}
 	
 	private static double trace(double[][] matrix) {
@@ -171,11 +166,15 @@ public class Feature {
 	}
 	
 	public static double getJD() { //获取概率分布的散度
+		if (Feature.feature == null) {
+			Feature.getInstance();
+		}
 		Matrix sigma0 = getForSigma(0);
 		Matrix sigma1 = getForSigma(1);
 		Matrix sigma0ni = sigma0.inverse();
 		Matrix sigma1ni = sigma1.inverse();
-		Matrix I2 = Matrix.identity(attriNum, attriNum).times(2.0);
+		int size = FileIO.countUsed();
+		Matrix I2 = Matrix.identity(size, size).times(2.0);
 		Matrix muMinus = getForMuMinus();
 		Matrix part1 = (sigma0ni.times(sigma1)).plus(sigma1ni.times(sigma0)).minus(I2);
 		Matrix part2 = (muMinus.transpose()).times(sigma0ni.plus(sigma1ni)).times(muMinus);
