@@ -32,7 +32,7 @@ public class SelectMethod {
 			}
 		}
 		System.out.println("maxScore:"+maxScore);
-		System.out.println("the max pairs:"+maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
+		System.out.println("the max pairs using voilentSearch is:"+maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
 		
 		//设置为最佳组合
 		fio.setAllUsed(false);
@@ -83,7 +83,13 @@ public class SelectMethod {
 		for (int i = 0; i < 3; i++) {
 			System.out.print(maxAttri[i]+" ");
 		}
-		System.out.println();		
+		System.out.println();	
+		//设置为最佳组合
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(maxAttri[i], true);
+		} 
+		TrainAndTestByLibSVM.main(null);
 	}
 	
 	/*
@@ -145,10 +151,46 @@ public class SelectMethod {
 		hasDelete[thisAdd] = 0;
 	}
 	
+	/*
+	 * 单独最优特征的组合，次优算法，贪心算法
+	 */
+	public void tanXinMethod(int standard) {
+		FileIO fio = FileIO.getInstance();
+		int[] maxAttri = new int [3];
+		Map<Integer,Double> scores = new HashMap<Integer, Double>();
+		for (int i = 0; i < FileIO.attriNum; i++) {
+			fio.setAllUsed(false);
+			fio.beUsed.set(i, true);
+			double score = getScore(standard);
+			scores.put(i, score);
+		}
+		for (int i = 0; i < 3; i++) {
+			int index = 0; //找到最大的元素，表明它最好
+			double maxScore1 = Double.MIN_VALUE;
+			for (Entry<Integer, Double> item: scores.entrySet()) {
+				if (item.getValue() > maxScore1) {
+					maxScore1 = item.getValue();
+					index = item.getKey();
+				}
+			}
+			maxAttri[i] = index;
+			scores.remove(index);
+		}
+		
+		System.out.println("the max pairs using tanxinMethod is:"+
+						maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
+		
+		//设置为最佳组合
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(maxAttri[i], true);
+		} 
+		TrainAndTestByLibSVM.main(null);	
+	}
+	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
-		sm1.fenZhiDingJie(1);
-		sm1.violentSearch(1);
+		sm1.tanXinMethod(0);
 	}
 	
 	class MaxInfo {
