@@ -226,10 +226,50 @@ public class SelectMethod {
 		TrainAndTestByLibSVM.main(null);	
 	}
 	
+	/*
+	 * 顺序后退法，次优算法
+	 */
+	public void backwardSelection(int standard) {
+		ArrayList<Integer> candidate = new ArrayList<Integer>();
+		for (int i = 0; i < FileIO.attriNum; i++) {
+			candidate.add(i);
+		}
+		FileIO fio = FileIO.getInstance();
+		fio.setAllUsed(false);
+		while (candidate.size() > 3) {
+			int worstIndex = 0;
+			double maxScore = Double.MIN_VALUE; //除去某个元素外的分数
+			fio.setAllUsed(false);
+			for (int j = 0; j < candidate.size(); j++) { //一轮开始之前的准备工作
+				fio.beUsed.set(candidate.get(j), true);
+			}
+			for (int i =  0; i < candidate.size(); i++) {
+				fio.beUsed.set(candidate.get(i), false);
+				double score = this.getScore(standard);
+				if (score > maxScore) {
+					maxScore = score;
+					worstIndex = i;
+				}
+				fio.beUsed.set(candidate.get(i), true);
+			}
+			candidate.remove(worstIndex);
+		}
+		
+		System.out.println("the max pairs using tanxinMethod is:"+
+				candidate.get(0)+" "+candidate.get(1)+" "+candidate.get(2));
+		//设置为最佳组合
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(candidate.get(i), true);
+		} 
+		TrainAndTestByLibSVM.main(null);	
+	}
+	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
-		sm1.tanXinMethod(0);
-		sm1.forwardSelection(0);
+		sm1.tanXinMethod(1);
+		sm1.backwardSelection(1);
+		sm1.forwardSelection(1);
 	}
 	
 	class MaxInfo {
