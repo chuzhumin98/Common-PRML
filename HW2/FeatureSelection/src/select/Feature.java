@@ -163,7 +163,8 @@ public class Feature {
 		Matrix Sb1 = Feature.getForSb();
 		Matrix Sw1 = Feature.getForSw();
 		Sb1 = Sb1.minus(Sw1);
-		double J5 = Sb1.det() / Sw1.det();
+		double J5 = (Sb1.det() / Sw1.det());
+		//System.out.println(Sb1.det()+"/"+Sw1.det()+"="+J5);
 		return J5;
 	}
 	
