@@ -131,12 +131,40 @@ public class Feature {
 		return sum;
 	}
 	
+	/*
+	 * 类内类间距判据3
+	 */
+	public static double getJ3() {
+		if (Feature.feature == null) {
+			Feature.getInstance();
+		}
+		Matrix Sb1 = new Matrix(Sb);
+		Matrix Sw1 = new Matrix(Sw);
+		double J3 = Sb1.det() / Sw1.det();
+		J3 = Math.log(J3);
+		return J3;
+	}
+	
 	public static double getJ4() { //获取类内类间距离判据4
 		if (Feature.feature == null) {
 			Feature.getInstance();
 		}
 		double J4 = Feature.trace(Feature.Sb) / Feature.trace(Feature.Sw);
 		return J4;
+	}
+	
+	/*
+	 * 类内类间距判据5
+	 */
+	public static double getJ5() {
+		if (Feature.feature == null) {
+			Feature.getInstance();
+		}
+		Matrix Sb1 = new Matrix(Sb);
+		Matrix Sw1 = new Matrix(Sw);
+		Sb1 = Sb1.minus(Sw1);
+		double J5 = Sb1.det() / Sw1.det();
+		return J5;
 	}
 	
 	public static Matrix getForSigma(int index) { //index为0或1
@@ -197,10 +225,10 @@ public class Feature {
 			Feature.getInstance();
 		}
 		double numerator = Math.abs(feature[0].mu[index] - feature[1].mu[index]);
-		int n_1 = count[0] - 1;
-		int m_1 = count[1] - 1;
-		double sp2 = (n_1*feature[0].sigma[index][index] + 
-				m_1*feature[1].sigma[index][index]) / 
+		int m_1 = count[0] - 1;
+		int n_1 = count[1] - 1;
+		double sp2 = (m_1*feature[0].sigma[index][index] + 
+				n_1*feature[1].sigma[index][index]) / 
 				(double)(n_1+m_1);
 		double den = Math.sqrt(sp2) * Math.sqrt(1.0/(double)count[0] + 1.0/(double)count[1]);
 		double t = numerator / den;

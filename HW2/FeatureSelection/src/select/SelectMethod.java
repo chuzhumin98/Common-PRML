@@ -99,13 +99,24 @@ public class SelectMethod {
 		double score = 0.0;
 		switch (standard) {
 		case 0:
-			score = Feature.getJ4();
+			System.out.println("using standard J3");
+			score = Feature.getJ3();
 			break;
 		case 1:
+			System.out.println("using standard J4");
+			score = Feature.getJ4();
+			break;
+		case 2:
+			System.out.println("using standard J5");
+			score = Feature.getJ5();
+			break;
+		case 3:
+			System.out.println("using standard JD");
 			score = Feature.getJD();
 			break;
 		default:
-			score = Feature.getJ4(); //默认采用J4
+			System.out.println("using standard J3");
+			score = Feature.getJ3(); //默认采用J3
 		}
 		return score;
 	}
