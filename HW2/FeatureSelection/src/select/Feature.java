@@ -14,6 +14,7 @@ public class Feature {
 	public static double[][] Sb; //Sb矩阵
 	public static double[][] Sw; //Sw矩阵
 	public static double[] Mu; //整体的mu矩阵
+	static int[] count = new int [2];
 	Feature() {
 		mu = new double [attriNum];
 		sigma = new double [attriNum][attriNum];
@@ -55,8 +56,7 @@ public class Feature {
 		if (Feature.feature == null) {
 			System.err.println("Error for use method initFeature illegaly");
 		}
-		FileIO fio = FileIO.getInstance();
-		int[] count = new int [2];		
+		FileIO fio = FileIO.getInstance();		
 		Feature.initMatrix(); //将矩阵初始化
 		
 		//计算mu向量
@@ -183,6 +183,23 @@ public class Feature {
 		
 	}
 	
+	/*
+	 * 基于t分布的方法，通过比较其t-检验的大小来决定排名
+	 */
+	public static double getTDistribution(int index) { 
+		if (Feature.feature == null) {
+			Feature.getInstance();
+		}
+		double numerator = Math.abs(feature[0].mu[index] - feature[1].mu[index]);
+		int n_1 = count[0] - 1;
+		int m_1 = count[1] - 1;
+		double sp2 = (n_1*feature[0].sigma[index][index] + 
+				m_1*feature[1].sigma[index][index]) / 
+				(double)(n_1+m_1);
+		double den = Math.sqrt(sp2) * Math.sqrt(1.0/(double)count[0] + 1.0/(double)count[1]);
+		double t = numerator / den;
+		return t;
+	}
 	
 	public static void main(String[] args) {
 		System.out.println("J4:"+Feature.getJ4());

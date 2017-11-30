@@ -329,10 +329,74 @@ public class SelectMethod {
 		TrainAndTestByLibSVM.main(null);	
 	}
 	
+	/*
+	 * 统计方法，standard为0表示t-test，1表示秩检验
+	 */
+	public void statisticMethod(int standard) {
+		int[] maxAttri = new int [3];
+		Map<Integer,Double> scores = new HashMap<Integer, Double>();
+		switch (standard) {
+		case 0:
+			System.out.println("t-test method result:");
+			break;
+		case 1:
+			System.out.println("rank-test method result:");
+			break;
+		default:
+			System.out.println("t-test method result:");
+		}
+		for (int i = 0; i < FileIO.attriNum; i++) {
+			double score = getStatisticScore(standard, i);
+			scores.put(i, score);
+			System.out.println(i+":"+score);
+		}
+		for (int i = 0; i < 3; i++) {
+			int index = 0; //找到最大的元素，表明它最好
+			double maxScore1 = Double.MIN_VALUE;
+			for (Entry<Integer, Double> item: scores.entrySet()) {
+				if (item.getValue() > maxScore1) {
+					maxScore1 = item.getValue();
+					index = item.getKey();
+				}
+			}
+			maxAttri[i] = index;
+			scores.remove(index);
+		}
+		
+		System.out.println("the max pairs using statisticMethod is:"+
+						maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
+		
+		//设置为最佳组合
+		FileIO fio = FileIO.getInstance();
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(maxAttri[i], true);
+		} 
+		TrainAndTestByLibSVM.main(null);	
+	}
+	
+	/*
+	 * 获取统计检验某项准则下的评分的方法，通过standard决定使用的方法
+	 */
+	private double getStatisticScore(int standard, int index) {
+		double score = 0.0;
+		switch (standard) {
+		case 0:
+			score = Feature.getTDistribution(index);
+			break;
+		case 1:
+			score = Feature.getTDistribution(index);
+			break;
+		default:
+			score = Feature.getTDistribution(index); //默认采用t-test
+		}
+		return score;
+	}
+	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
 		sm1.backwardSelection(0);
-		sm1.lrMethod(0);
+		sm1.statisticMethod(0);
 	}
 	
 	class MaxInfo {
