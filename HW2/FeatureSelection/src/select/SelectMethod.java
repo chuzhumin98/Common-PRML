@@ -385,7 +385,7 @@ public class SelectMethod {
 			score = Feature.getTDistribution(index);
 			break;
 		case 1:
-			score = Feature.getTDistribution(index);
+			score = Feature.getRankDistribution(index);
 			break;
 		default:
 			score = Feature.getTDistribution(index); //默认采用t-test
@@ -396,7 +396,7 @@ public class SelectMethod {
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
 		sm1.backwardSelection(0);
-		sm1.statisticMethod(0);
+		sm1.statisticMethod(1);
 	}
 	
 	class MaxInfo {

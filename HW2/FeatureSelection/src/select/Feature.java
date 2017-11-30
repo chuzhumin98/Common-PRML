@@ -1,6 +1,12 @@
 package select;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import Jama.Matrix;
 import net.sf.json.JSONArray;
@@ -201,8 +207,57 @@ public class Feature {
 		return t;
 	}
 	
+	/*
+	 * 基于秩参数的方法，通过观察秩参数所在取值的区域
+	 */
+	public static double getRankDistribution(int index) {
+		Map<Integer, AttriData> map = new HashMap<Integer, AttriData>();
+		FileIO fio = FileIO.getInstance();
+		for (int i = 0; i < fio.trainData.size(); i++) {
+			int label = fio.trainData.get(i).getInt("label");
+			double value = fio.trainData.get(i).getJSONArray("attri").getDouble(index);
+			AttriData atd = new AttriData(label, value);
+			map.put(i, atd);
+		}
+		//这里将map.entrySet()转换成list
+        List<Map.Entry<Integer, AttriData>> list = new ArrayList<Map.Entry<Integer,AttriData>>(map.entrySet());
+        //然后通过比较器来实现排序
+        Collections.sort(list,new Comparator<Map.Entry<Integer,AttriData>>() {
+            //升序排序
+            public int compare(Entry<Integer, AttriData> o1,
+                    Entry<Integer, AttriData> o2) {
+                if (o1.getValue().value - o2.getValue().value < 0) {
+                	return -1;
+                } else {
+                	return 1;
+                }
+            }   
+        });
+        double countX = 0.0;
+        for (int i = 0; i < list.size(); i++) {
+        	if (list.get(i).getValue().label == 0) {
+        		countX += i + 1;
+        	}
+        }
+        double num = Math.abs(count[0]*(count[0]+count[1]+1)/2.0 - countX);
+        double den = Math.sqrt(count[0]*count[1]*(count[0]+count[1]+1)/12.0);
+        double rankValue = num / den;
+        return rankValue;
+	}
+	
 	public static void main(String[] args) {
 		System.out.println("J4:"+Feature.getJ4());
 		System.out.println("JD:"+Feature.getJD());
+		Feature.getRankDistribution(4);
+	}
+	
+	
+	static class AttriData {
+		public int label; //0或1
+		public double value; //某个attribute的值
+		public AttriData(int label, double value) {
+			this.label = label;
+			this.value = value;
+		}
 	}
 }
