@@ -216,7 +216,7 @@ public class SelectMethod {
 			candidate.remove(maxIndex);
 		}
 		
-		System.out.println("the max pairs using tanxinMethod is:"+
+		System.out.println("the max pairs using forwardSelection is:"+
 				maxAttri[0]+" "+ maxAttri[1]+" "+maxAttri[2]);
 		//设置为最佳组合
 		fio.setAllUsed(false);
@@ -255,7 +255,71 @@ public class SelectMethod {
 			candidate.remove(worstIndex);
 		}
 		
-		System.out.println("the max pairs using tanxinMethod is:"+
+		System.out.println("the max pairs using backwardSelection is:"+
+				candidate.get(0)+" "+candidate.get(1)+" "+candidate.get(2));
+		//设置为最佳组合
+		fio.setAllUsed(false);
+		for (int i = 0; i < 3; i++) {
+			fio.beUsed.set(candidate.get(i), true);
+		} 
+		TrainAndTestByLibSVM.main(null);	
+	}
+	
+	/*
+	 * 增l减r法，次优算法（l取1，r取3）
+	 */
+	public void lrMethod(int standard) {
+		ArrayList<Integer> candidate = new ArrayList<Integer>();
+		ArrayList<Integer> delete = new ArrayList<Integer>();
+		for (int i = 0; i < FileIO.attriNum; i++) {
+			candidate.add(i);
+		}
+		FileIO fio = FileIO.getInstance();
+		fio.setAllUsed(false);
+		int r = 3;
+		int l = 1;
+		while (candidate.size() != 3) {
+			for (int i = 0; i < r; i++) {
+				int worstIndex = 0;
+				double maxScore = Double.MIN_VALUE; //除去某个元素外的分数
+				fio.setAllUsed(false);
+				for (int j = 0; j < candidate.size(); j++) { //一轮开始之前的准备工作
+					fio.beUsed.set(candidate.get(j), true);
+				}
+				for (int j =  0; j < candidate.size(); j++) {
+					fio.beUsed.set(candidate.get(j), false);
+					double score = this.getScore(standard);
+					if (score > maxScore) {
+						maxScore = score;
+						worstIndex = j;
+					}
+					fio.beUsed.set(candidate.get(j), true);
+				}
+				int deleteOne = candidate.remove(worstIndex);
+				delete.add(deleteOne);
+			}
+			if (candidate.size() == 3) break;
+			for (int i = 0; i < l; i++) {
+				int bestIndex = 0;
+				double maxScore = Double.MIN_NORMAL; //增加一个元素使得分数最高
+				fio.setAllUsed(true);
+				for (int j = 0; j < delete.size(); j++) {
+					fio.beUsed.set(delete.get(j), false);
+				}
+				for (int j = 0; j < delete.size(); j++) {
+					fio.beUsed.set(delete.get(j), true);
+					double score = this.getScore(standard);
+					if (score > maxScore) {
+						maxScore = score;
+						bestIndex = j;
+					}
+					fio.beUsed.set(delete.get(j), false);
+				}
+				int addOne = delete.remove(bestIndex);
+				candidate.add(addOne);
+			}
+		}
+		System.out.println("the max pairs using lrMethod is:"+
 				candidate.get(0)+" "+candidate.get(1)+" "+candidate.get(2));
 		//设置为最佳组合
 		fio.setAllUsed(false);
@@ -267,9 +331,8 @@ public class SelectMethod {
 	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
-		sm1.tanXinMethod(1);
-		sm1.backwardSelection(1);
-		sm1.forwardSelection(1);
+		sm1.backwardSelection(0);
+		sm1.lrMethod(0);
 	}
 	
 	class MaxInfo {
