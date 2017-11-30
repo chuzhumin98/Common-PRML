@@ -132,17 +132,17 @@ public class Feature {
 	}
 	
 	/*
-	 * 类内类间距判据3
+	 * 类内类间距判据2
 	 */
-	public static double getJ3() {
+	public static double getJ2() {
 		if (Feature.feature == null) {
 			Feature.getInstance();
 		}
-		Matrix Sb1 = new Matrix(Sb);
-		Matrix Sw1 = new Matrix(Sw);
-		double J3 = Sb1.det() / Sw1.det();
-		J3 = Math.log(J3);
-		return J3;
+		Matrix Sb1 = Feature.getForSb();
+		Matrix Sw1 = Feature.getForSw();
+		Matrix pro = Sw1.inverse().times(Sb1);
+		double J2 = pro.trace();
+		return J2;
 	}
 	
 	public static double getJ4() { //获取类内类间距离判据4
@@ -160,11 +160,45 @@ public class Feature {
 		if (Feature.feature == null) {
 			Feature.getInstance();
 		}
-		Matrix Sb1 = new Matrix(Sb);
-		Matrix Sw1 = new Matrix(Sw);
+		Matrix Sb1 = Feature.getForSb();
+		Matrix Sw1 = Feature.getForSw();
 		Sb1 = Sb1.minus(Sw1);
 		double J5 = Sb1.det() / Sw1.det();
 		return J5;
+	}
+	
+	public static Matrix getForSb() { 
+		int size = FileIO.countUsed();
+		Matrix mtmp = Matrix.identity(size, size);
+		ArrayList<Integer> useIndex = new ArrayList<Integer>();
+		for (int i = 0; i < attriNum; i++) {
+			if (FileIO.fileIO.beUsed.get(i)) {
+				useIndex.add(i);
+			}
+		}
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				mtmp.set(i, j, Sb[useIndex.get(i)][useIndex.get(j)]);
+			}
+		}
+		return mtmp;
+	}
+	
+	public static Matrix getForSw() { 
+		int size = FileIO.countUsed();
+		Matrix mtmp = Matrix.identity(size, size);
+		ArrayList<Integer> useIndex = new ArrayList<Integer>();
+		for (int i = 0; i < attriNum; i++) {
+			if (FileIO.fileIO.beUsed.get(i)) {
+				useIndex.add(i);
+			}
+		}
+		for (int i = 0; i < size; i++) {
+			for (int j = 0; j < size; j++) {
+				mtmp.set(i, j, Sw[useIndex.get(i)][useIndex.get(j)]);
+			}
+		}
+		return mtmp;
 	}
 	
 	public static Matrix getForSigma(int index) { //index为0或1

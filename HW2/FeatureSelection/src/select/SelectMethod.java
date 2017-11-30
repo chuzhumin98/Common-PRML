@@ -13,6 +13,7 @@ public class SelectMethod {
 	public void violentSearch(int standard) { //暴力搜索
 		FileIO fio = FileIO.getInstance();
 		double maxScore = Double.MIN_VALUE;
+		this.getDisplayStandard(standard);
 		int[] maxAttri = new int [3];
 		for (int i = 0; i < FileIO.attriNum; i++) {
 			for (int j = i+1; j < FileIO.attriNum; j++) {
@@ -40,12 +41,14 @@ public class SelectMethod {
 			fio.beUsed.set(maxAttri[i], true);
 		} 
 		TrainAndTestByLibSVM.main(null);		
+		System.out.println();
 	}
 	
 	/*
 	 * 分支定界算法，采用树结构的思想，并用数组来代替其实现，属于最优算法
 	 */
 	public void fenZhiDingJie(int standard) {
+		this.getDisplayStandard(standard);
 		FileIO fio = FileIO.getInstance();
 		int[] hasDelete = new int [FileIO.attriNum];
 		MaxInfo maxScore = new MaxInfo();
@@ -90,6 +93,7 @@ public class SelectMethod {
 			fio.beUsed.set(maxAttri[i], true);
 		} 
 		TrainAndTestByLibSVM.main(null);
+		System.out.println();
 	}
 	
 	/*
@@ -99,26 +103,43 @@ public class SelectMethod {
 		double score = 0.0;
 		switch (standard) {
 		case 0:
-			System.out.println("using standard J3");
-			score = Feature.getJ3();
+			score = Feature.getJ2();
 			break;
 		case 1:
-			System.out.println("using standard J4");
 			score = Feature.getJ4();
 			break;
 		case 2:
-			System.out.println("using standard J5");
 			score = Feature.getJ5();
 			break;
 		case 3:
-			System.out.println("using standard JD");
 			score = Feature.getJD();
 			break;
 		default:
-			System.out.println("using standard J3");
-			score = Feature.getJ3(); //默认采用J3
+			score = Feature.getJ4(); //默认采用J4
 		}
 		return score;
+	}
+	
+	/*
+	 * 展示选用的准则，通过standard决定使用的方法
+	 */
+	private void getDisplayStandard(int standard) {
+		switch (standard) {
+		case 0:
+			System.out.println("using standard J2");
+			break;
+		case 1:
+			System.out.println("using standard J4");
+			break;
+		case 2:
+			System.out.println("using standard J5");
+			break;
+		case 3:
+			System.out.println("using standard JD");
+			break;
+		default:
+			System.out.println("using standard J3");
+		}
 	}
 	
 	/*
@@ -166,6 +187,7 @@ public class SelectMethod {
 	 * 单独最优特征的组合，次优算法，贪心算法
 	 */
 	public void tanXinMethod(int standard) {
+		this.getDisplayStandard(standard);
 		FileIO fio = FileIO.getInstance();
 		int[] maxAttri = new int [3];
 		Map<Integer,Double> scores = new HashMap<Integer, Double>();
@@ -196,13 +218,15 @@ public class SelectMethod {
 		for (int i = 0; i < 3; i++) {
 			fio.beUsed.set(maxAttri[i], true);
 		} 
-		TrainAndTestByLibSVM.main(null);	
+		TrainAndTestByLibSVM.main(null);
+		System.out.println();
 	}
 	
 	/*
 	 * 顺序前进法，次优算法
 	 */
 	public void forwardSelection(int standard) {
+		this.getDisplayStandard(standard);
 		ArrayList<Integer> candidate = new ArrayList<Integer>();
 		for (int i = 0; i < FileIO.attriNum; i++) {
 			candidate.add(i);
@@ -235,12 +259,14 @@ public class SelectMethod {
 			fio.beUsed.set(maxAttri[i], true);
 		} 
 		TrainAndTestByLibSVM.main(null);	
+		System.out.println();
 	}
 	
 	/*
 	 * 顺序后退法，次优算法
 	 */
 	public void backwardSelection(int standard) {
+		this.getDisplayStandard(standard);
 		ArrayList<Integer> candidate = new ArrayList<Integer>();
 		for (int i = 0; i < FileIO.attriNum; i++) {
 			candidate.add(i);
@@ -273,13 +299,15 @@ public class SelectMethod {
 		for (int i = 0; i < 3; i++) {
 			fio.beUsed.set(candidate.get(i), true);
 		} 
-		TrainAndTestByLibSVM.main(null);	
+		TrainAndTestByLibSVM.main(null);
+		System.out.println();
 	}
 	
 	/*
 	 * 增l减r法，次优算法（l取1，r取3）
 	 */
 	public void lrMethod(int standard) {
+		this.getDisplayStandard(standard);
 		ArrayList<Integer> candidate = new ArrayList<Integer>();
 		ArrayList<Integer> delete = new ArrayList<Integer>();
 		for (int i = 0; i < FileIO.attriNum; i++) {
@@ -337,7 +365,8 @@ public class SelectMethod {
 		for (int i = 0; i < 3; i++) {
 			fio.beUsed.set(candidate.get(i), true);
 		} 
-		TrainAndTestByLibSVM.main(null);	
+		TrainAndTestByLibSVM.main(null);
+		System.out.println();
 	}
 	
 	/*
@@ -384,6 +413,7 @@ public class SelectMethod {
 			fio.beUsed.set(maxAttri[i], true);
 		} 
 		TrainAndTestByLibSVM.main(null);	
+		System.out.println();
 	}
 	
 	/*
@@ -406,8 +436,10 @@ public class SelectMethod {
 	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
-		sm1.backwardSelection(0);
-		sm1.statisticMethod(1);
+		sm1.violentSearch(0);
+		sm1.violentSearch(1);
+		sm1.violentSearch(2);
+		sm1.violentSearch(3);
 	}
 	
 	class MaxInfo {
