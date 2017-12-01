@@ -11,6 +11,28 @@ public class ExtractMethod {
 	public static final int attriNum = 10;
 	public static final int extractNum = 2;
 	/*
+	 * L-U变换本身性质观察
+	 */
+	public void searchPropery() {
+		Feature.getInstance();
+		Matrix Sw1 = new Matrix(Feature.Sw);
+		Matrix Sb1 = new Matrix(Feature.Sb);
+		EigenvalueDecomposition eigens = Sw1.eig();
+		double[] eigenValue = eigens.getRealEigenvalues();
+		Matrix eigenVector = eigens.getV();
+		System.out.println("following are the eigenvalues:");
+		for (int i = 0; i < eigenValue.length; i++){
+			System.out.print(eigenValue[i]+" ");
+			if ((i+1)%5 == 0) {
+				System.out.println();
+			}
+		}
+		System.out.println("\n");
+		System.out.println("following are the eigenvectors:");
+		eigenVector.print(10, 10);
+	}
+	
+	/*
 	 * 从类均值中提取判别信息
 	 */
 	public void basedOnClassAverage() {
@@ -47,7 +69,7 @@ public class ExtractMethod {
 		for (int i = 0; i < extractNum; i++) {
 			System.out.print(maxIndex[i]+" ");
 		}
-		System.out.println();
+		System.out.println(); 
 		
 		FileIO fio = FileIO.getInstance();
 		fio.writeExtractAttriForSVM(eigenVector, maxIndex); //向文件中写入提取特征
@@ -90,7 +112,7 @@ public class ExtractMethod {
 		for (int i = 0; i < attriNum; i++) {
 			double Jyi = Feature.rij[0][i]* Feature.rij[1][i];
 			map.put(i, Jyi);
-			System.out.println(i+":"+Jyi);
+			System.out.println(i+":"+Feature.rij[0][i]+" "+Feature.rij[1][i]+" "+Jyi);
 		}
 		//下面找出最佳的两维特征
 		int[] maxIndex = new int [extractNum];
@@ -106,7 +128,7 @@ public class ExtractMethod {
 			maxIndex[i] = bestIndex;
 			map.remove(bestIndex);
 		}
-		//maxIndex[0] = 9;
+		//maxIndex[1s] = 9;
 		//maxIndex[1] = 7;
 		System.out.print("the best dim:");
 		for (int i = 0; i < extractNum; i++) {
@@ -140,7 +162,8 @@ public class ExtractMethod {
 		Matrix B = eigenVector.times(Gampi);
 		Matrix Sbpi = B.transpose().times(Sb1).times(B);
 		EigenvalueDecomposition eigenpi = Sbpi.eig();
-		Matrix bestVector = eigenpi.getV();
+		Matrix bestVector = B.times(eigenpi.getV());
+		eigenpi.getD().print(10, 10);
 		
 		Feature.getRij(eigenVector, eigenValue);
 		Map<Integer,Double> map = new HashMap<Integer,Double>(); //记录index与J(y)的对应关系
@@ -158,7 +181,7 @@ public class ExtractMethod {
 				minValue = item.getValue();
 			}
 		}
-		bestIndex = 9;
+		//bestIndex = 9;
 		for (int i = 0; i < attriNum; i++) {
 			bestVector.set(i, 1, eigenVector.get(i, bestIndex));
 		}
