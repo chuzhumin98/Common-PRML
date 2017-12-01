@@ -13,11 +13,14 @@ import net.sf.json.JSONObject;
 
 public class FileIO {
 	public static final int attriNum = 10;
+	public static final int extractNum = 2;
 	public static String trainExport = "cache/dataset3mysvm.txt";
 	public static String testExport = "cache/dataset4mysvm.txt";
 	public static String trainTxt = "input/dataset3svm.txt";
 	public static String testTxt = "input/dataset4svm.txt";
 	public ArrayList<JSONObject> trainData = new ArrayList<JSONObject>();
+	public ArrayList<JSONObject> extractTrainData = new ArrayList<JSONObject>();
+	public ArrayList<JSONObject> extractTestData = new ArrayList<JSONObject>();
 	public ArrayList<JSONObject> testData = new ArrayList<JSONObject>();
 	public ArrayList<Boolean> beUsed = new ArrayList<Boolean>();
 	public static FileIO fileIO = null;
@@ -32,6 +35,8 @@ public class FileIO {
 		if (fileIO == null) {
 			fileIO = new FileIO();
 		}
+		fileIO.extractTestData.clear(); //清空提取信息的记录
+		fileIO.extractTrainData.clear();
 		return fileIO;
 	}
 	
@@ -135,6 +140,64 @@ public class FileIO {
 					if (this.beUsed.get(j)) {
 						out.print(j+":"+this.testData.get(i).getJSONArray("attri").getDouble(j)+" ");
 					}
+				}
+				out.println();
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	/*
+	 * 向文件中写入符合SVM加载需求的提取出来的特征信息
+	 */
+	public void writeExtractAttriForSVM(Matrix eigenVector, int[] maxIndex) {
+		this.writeExtractTrainAttriForSVM(eigenVector, maxIndex);
+		this.writeExtractTestAttriForSVM(eigenVector, maxIndex);
+	}
+	
+	public void writeExtractTrainAttriForSVM(Matrix eigenVector, int[] maxIndex) {
+		try {
+			FileIO fio = FileIO.getInstance();
+			PrintStream out = new PrintStream(new File(this.trainExport));
+			for (int i = 0; i < this.trainData.size(); i++) {
+				out.print(this.trainData.get(i).getInt("label")+" ");
+				double[] newAttri = new double [FileIO.extractNum];
+				for (int j = 0; j < FileIO.extractNum; j++) {
+					double sums = 0.0;
+					for (int k = 0; k < FileIO.attriNum; k++) {
+						sums += eigenVector.get(k, maxIndex[j])*this.trainData.get(i).getJSONArray("attri").getDouble(k);
+					}
+					newAttri[j] = sums;
+				}
+				for (int j = 0; j < FileIO.extractNum; j++) {
+					out.print(j+":"+newAttri[j]+" ");
+				}
+				out.println();
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void writeExtractTestAttriForSVM(Matrix eigenVector, int[] maxIndex) {
+		try {
+			FileIO fio = FileIO.getInstance();
+			PrintStream out = new PrintStream(new File(this.testExport));
+			for (int i = 0; i < this.testData.size(); i++) {
+				out.print(this.testData.get(i).getInt("label")+" ");
+				double[] newAttri = new double [FileIO.extractNum];
+				for (int j = 0; j < FileIO.extractNum; j++) {
+					double sums = 0.0;
+					for (int k = 0; k < FileIO.attriNum; k++) {
+						sums += eigenVector.get(k, maxIndex[j])*this.testData.get(i).getJSONArray("attri").getDouble(k);
+					}
+					newAttri[j] = sums;
+				}
+				for (int j = 0; j < FileIO.extractNum; j++) {
+					out.print(j+":"+newAttri[j]+" ");
 				}
 				out.println();
 			}

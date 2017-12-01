@@ -15,6 +15,7 @@ import net.sf.json.JSONObject;
 public class Feature {
 	public static Feature[] feature = null; 
 	public static final int attriNum = 10;
+	public static final int extractNum = 2;
 	public double[] mu;
 	public double[][] sigma;
 	public static double[][] Sb; //Sb矩阵
