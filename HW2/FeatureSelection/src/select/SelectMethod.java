@@ -16,8 +16,8 @@ public class SelectMethod {
 		this.getDisplayStandard(standard);
 		int[] maxAttri = new int [3];
 		for (int i = 0; i < FileIO.attriNum; i++) {
-			for (int j = i; j < FileIO.attriNum; j++) {
-				for (int k = j; k < FileIO.attriNum; k++) {
+			for (int j = i+1; j < FileIO.attriNum; j++) {
+				for (int k = j+1; k < FileIO.attriNum; k++) {
 					fio.setAllUsed(false);
 					fio.beUsed.set(i, true);
 					fio.beUsed.set(j, true);
@@ -436,10 +436,8 @@ public class SelectMethod {
 	
 	public static void main(String[] args) {
 		SelectMethod sm1 = new SelectMethod();
-		sm1.violentSearch(0);
-		sm1.violentSearch(1);
-		sm1.violentSearch(2);
-		sm1.violentSearch(3);
+		sm1.statisticMethod(0);
+		sm1.statisticMethod(1);
 	}
 	
 	class MaxInfo {
