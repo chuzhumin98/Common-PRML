@@ -85,10 +85,98 @@ public class ExtractMethod {
 			System.out.print(eigenValue[i]+" ");
 		}
 		System.out.println("\n"); */
+		
+		Map<Integer,Double> map = new HashMap<Integer,Double>(); //记录index与J(y)的对应关系
+		for (int i = 0; i < attriNum; i++) {
+			double Jyi = Feature.rij[0][i]* Feature.rij[1][i];
+			map.put(i, Jyi);
+			System.out.println(i+":"+Jyi);
+		}
+		//下面找出最佳的两维特征
+		int[] maxIndex = new int [extractNum];
+		for (int i = 0; i < extractNum; i++) {
+			int bestIndex = 0;
+			double minValue = Double.MAX_VALUE;
+			for (Entry<Integer,Double> item: map.entrySet()) {
+				if (item.getValue() < minValue) {
+					bestIndex = item.getKey();
+					minValue = item.getValue();
+				}
+			}
+			maxIndex[i] = bestIndex;
+			map.remove(bestIndex);
+		}
+		//maxIndex[0] = 9;
+		//maxIndex[1] = 7;
+		System.out.print("the best dim:");
+		for (int i = 0; i < extractNum; i++) {
+			System.out.print(maxIndex[i]+" ");
+		}
+		System.out.println();
+		
+		FileIO fio = FileIO.getInstance();
+		fio.writeExtractAttriForSVM(eigenVector, maxIndex); //向文件中写入提取特征
+		TrainAndTestByLibSVM tat = TrainAndTestByLibSVM.getInstance();  
+        System.out.println("正在训练分类模型。。。。");  
+        tat.trainByLibSVM(FileIO.trainExport);  
+        System.out.println("正在应用分类模型进行分类。。。。");  
+        tat.tellByLibSVM(FileIO.testExport);  
+	}
+	
+	/*
+	 * 包含在类平均向量中判别信息的最优压缩
+	 */
+	public void classAverageVectorBestPress() {
+		Feature.getInstance();
+		Matrix Sw1 = new Matrix(Feature.Sw);
+		Matrix Sb1 = new Matrix(Feature.Sb);
+		EigenvalueDecomposition eigens = Sw1.eig();
+		double[] eigenValue = eigens.getRealEigenvalues();
+		Matrix eigenVector = eigens.getV();
+		Matrix Gampi = Matrix.identity(attriNum, attriNum);
+		for (int i = 0; i < attriNum; i++) {
+			Gampi.set(i, i, 1/Math.sqrt(eigenValue[i]));
+		}
+		Matrix B = eigenVector.times(Gampi);
+		Matrix Sbpi = B.transpose().times(Sb1).times(B);
+		EigenvalueDecomposition eigenpi = Sbpi.eig();
+		Matrix bestVector = eigenpi.getV();
+		
+		Feature.getRij(eigenVector, eigenValue);
+		Map<Integer,Double> map = new HashMap<Integer,Double>(); //记录index与J(y)的对应关系
+		for (int i = 0; i < attriNum; i++) {
+			double Jyi = Feature.rij[0][i]* Feature.rij[1][i];
+			map.put(i, Jyi);
+			System.out.println(i+":"+Jyi);
+		}
+		//下面找出最佳的一维特征
+		int bestIndex = 0;
+		double minValue = Double.MAX_VALUE;
+		for (Entry<Integer,Double> item: map.entrySet()) {
+			if (item.getValue() < minValue) {
+				bestIndex = item.getKey();
+				minValue = item.getValue();
+			}
+		}
+		bestIndex = 9;
+		for (int i = 0; i < attriNum; i++) {
+			bestVector.set(i, 1, eigenVector.get(i, bestIndex));
+		}
+		int[] maxIndex = new int [attriNum];
+		maxIndex[0] = 0;
+		maxIndex[1] = 1;
+		
+		FileIO fio = FileIO.getInstance();
+		fio.writeExtractAttriForSVM(bestVector, maxIndex); //向文件中写入提取特征
+		TrainAndTestByLibSVM tat = TrainAndTestByLibSVM.getInstance();  
+        System.out.println("正在训练分类模型。。。。");  
+        tat.trainByLibSVM(FileIO.trainExport);  
+        System.out.println("正在应用分类模型进行分类。。。。");  
+        tat.tellByLibSVM(FileIO.testExport); 
 	}
 	
 	public static void main(String[] args) {
 		ExtractMethod em = new ExtractMethod();
-		em.classCentralEigenvectorExtract();
+		em.classAverageVectorBestPress();
 	}
 }

@@ -15,7 +15,6 @@ import net.sf.json.JSONObject;
 public class Feature {
 	public static Feature[] feature = null; 
 	public static final int attriNum = 10;
-	public static final int extractNum = 2;
 	public double[] mu;
 	public double[][] sigma;
 	public static double[][] Sb; //Sb矩阵
@@ -144,6 +143,7 @@ public class Feature {
 						index++;
 					}
 				}
+				//System.out.println(index);
 				double average = 0.0;
 				for (int k = 0; k < count[i]; k++) {
 					average += tmp[k];
@@ -157,13 +157,18 @@ public class Feature {
 				Feature.rij[i][j] = sigma;
 			}
 		}
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < attriNum; j++) {
+				Feature.rij[i][j] = rij[i][j] * 0.5 / eigenValue[j];
+			}
+		}
 		System.out.println("folowing given the Rij:");
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < attriNum; j++) {
 				System.out.print(rij[i][j]+" ");
 			}
 			System.out.println();
-		}
+		} 
 	}
 	
 	private static double trace(double[][] matrix) {
