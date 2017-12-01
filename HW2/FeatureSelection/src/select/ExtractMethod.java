@@ -57,6 +57,7 @@ public class ExtractMethod {
         System.out.println("正在应用分类模型进行分类。。。。");  
         tat.tellByLibSVM(FileIO.testExport);  
 		
+       // eigenVector.transpose().times(Sw1).times(eigenVector).print(10, 10);
 		/*eigenVector.print(10, 10);
 		eigenVector.getMatrix(0, 9, 0, 0).print(10, 10); */
 		/*for (int i = 0; i < eigenValue.length; i++){
@@ -68,8 +69,26 @@ public class ExtractMethod {
 		Sw1.times(eigenVector).print(10, 10); */
 	}
 	 
+	/*
+	 * 类中心化特征向量中分类信息的提取
+	 */
+	public void classCentralEigenvectorExtract() {
+		Feature.getInstance();
+		Matrix Sw1 = new Matrix(Feature.Sw);
+		Matrix Sb1 = new Matrix(Feature.Sb);
+		EigenvalueDecomposition eigens = Sw1.eig();
+		double[] eigenValue = eigens.getRealEigenvalues();
+		Matrix eigenVector = eigens.getV();
+		Feature.getRij(eigenVector, eigenValue);
+		
+		/*for (int i = 0; i < eigenValue.length; i++){
+			System.out.print(eigenValue[i]+" ");
+		}
+		System.out.println("\n"); */
+	}
+	
 	public static void main(String[] args) {
 		ExtractMethod em = new ExtractMethod();
-		em.basedOnClassAverage();
+		em.classCentralEigenvectorExtract();
 	}
 }

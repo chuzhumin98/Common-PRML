@@ -21,6 +21,7 @@ public class Feature {
 	public static double[][] Sb; //Sb矩阵
 	public static double[][] Sw; //Sw矩阵
 	public static double[] Mu; //整体的mu矩阵
+	public static double[][] rij = new double [2][attriNum];
 	static int[] count = new int [2];
 	Feature() {
 		mu = new double [attriNum];
@@ -119,6 +120,50 @@ public class Feature {
 		
 		System.out.println("female:"+count[0]);
 		System.out.println("male:"+count[1]);
+	}
+	
+	/*
+	 * 获得特征提取中的r_ij
+	 */
+	public static void getRij(Matrix eigenVector, double[] eigenValue) {
+		Feature.getInstance();
+		FileIO fio = FileIO.getInstance();
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < attriNum; j++) {
+				double[] tmp = new double [count[i]];
+				int index = 0;
+				for (int k = 0; k < fio.trainData.size(); k++) {
+					JSONObject json1 = fio.trainData.get(k);
+					if (json1.getInt("label") == i) {
+						double sums = 0.0;
+						for (int l = 0; l < attriNum; l++) {
+							double factor = json1.getJSONArray("attri").getDouble(l);
+							sums += factor * eigenVector.get(l, j);
+						}
+						tmp[index] = sums;
+						index++;
+					}
+				}
+				double average = 0.0;
+				for (int k = 0; k < count[i]; k++) {
+					average += tmp[k];
+				}
+				average /= (double)count[i];
+				double sigma = 0.0;
+				for (int k = 0; k < count[i]; k++) {
+					sigma += (tmp[k]-average) * (tmp[k]-average);
+				}
+				sigma /= (double)count[i];
+				Feature.rij[i][j] = sigma;
+			}
+		}
+		System.out.println("folowing given the Rij:");
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < attriNum; j++) {
+				System.out.print(rij[i][j]+" ");
+			}
+			System.out.println();
+		}
 	}
 	
 	private static double trace(double[][] matrix) {
