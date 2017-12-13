@@ -154,6 +154,6 @@ public class Cmeans {
 		FileIO file = FileIO.getInstance();
 		Cmeans cm = new Cmeans();
 		cm.doCmeans(file.personInital, 6);
-		file.outputCluster(file.personInital, "testPut.txt");
+		//file.outputCluster(file.personInital, "testPut.txt");
 	}
 }
