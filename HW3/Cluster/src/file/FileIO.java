@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 
@@ -48,6 +49,7 @@ public class FileIO {
 			}
 			System.out.println("the sample size:"+this.personInital.size());
 			this.calculateSigma();
+			this.doPCA();
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -85,6 +87,18 @@ public class FileIO {
 		//System.out.println("following is the sigma matrix:");
 		//this.sigma.print(10, 10);
 		
+	}
+	
+	private void doPCA() {
+		EigenvalueDecomposition eigens = this.sigma.eig();
+		Matrix eigenVector = eigens.getV();
+		
+		Matrix vector1 = eigenVector.getMatrix(0, this.attriNumInital-1, this.attriNumInital-1, this.attriNumInital-1);
+		eigenVector.print(10, 10);
+		vector1.print(10, 10);
+		this.sigma.times(vector1).print(10, 10);
+		
+		//eigens.getD().print(10, 10);
 	}
 	
 	public static void main(String[] args) {
