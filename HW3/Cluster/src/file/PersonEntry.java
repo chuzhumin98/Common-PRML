@@ -24,4 +24,18 @@ public class PersonEntry {
 		return string;
 	}
 	
+	/*
+	 * 获得和某个同类对象之间的距离(采用传统的欧式距离)
+	 */
+	public double getDistance(PersonEntry other) {
+		if (other.attriNum != this.attriNum) {
+			return Double.MAX_VALUE;
+		}
+		double sums = 0.0;
+		for (int i = 0; i < this.attriNum; i++) {
+			double delta = this.attris[i] - other.attris[i];
+			sums += delta * delta;
+		}
+		return sums;
+	}
 }
