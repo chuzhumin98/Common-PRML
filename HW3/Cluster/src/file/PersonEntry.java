@@ -10,5 +10,18 @@ public class PersonEntry {
 		cluster = -1; //初始化还未进行分类
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 * override toString method
+	 */
+	public String toString() {
+		String string = "";
+		for (int i = 0; i < this.attriNum; i++) {
+			string += String.valueOf(this.attris[i])+" ";
+		}
+		string += "cluster:"+String.valueOf(this.cluster);
+		return string;
+	}
 	
 }
