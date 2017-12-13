@@ -3,6 +3,7 @@ package cluster;
 import java.util.ArrayList;
 import java.util.Random;
 
+import file.FileIO;
 import file.PersonEntry;
 
 public class Cmeans {
@@ -30,8 +31,17 @@ public class Cmeans {
 		}
 		for (PersonEntry item: people) {
 			if (item.cluster == -1) { //还未分类的话找一个最近的分类
-				double minIndex = 0;
-				double minValue = Double.MAX_VALUE;
+				int minIndex = 0;
+				double minDist = Double.MAX_VALUE;
+				for (int i = 0; i < C; i++) {
+					PersonEntry base = people.get(indexes[i]);
+					double myDist = item.getDistance(base);
+					if (myDist < minDist) {
+						minIndex = i;
+						minDist = myDist;
+					}
+				}
+				item.cluster = minIndex;
 			}
 		}
 	}
@@ -43,5 +53,12 @@ public class Cmeans {
 		for (int i = 0; i < people.size(); i++) {
 			people.get(i).cluster = -1;
 		}
+	}
+	
+	public static void main(String[] args) {
+		FileIO file = FileIO.getInstance();
+		Cmeans cm = new Cmeans();
+		cm.doCmeans(file.personInital, 8);
+		file.outputCluster(file.personInital, "testPut.txt");
 	}
 }

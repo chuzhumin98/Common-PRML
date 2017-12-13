@@ -1,7 +1,9 @@
 package file;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -149,6 +151,26 @@ public class FileIO {
 		thissigma.print(10, 10);
 		
 		//eigens.getD().print(10, 10);
+	}
+	
+	/*
+	 * 将聚类结果输出到output文件夹中
+	 * 输出格式：前attriNum列为更属性的值，最后一列为分类结果
+	 */
+	public static void outputCluster(ArrayList<PersonEntry> people, String path) {
+		try (PrintStream out = new PrintStream(new File("output/"+path))) {
+			for (PersonEntry item: people) {
+				String outString = "";
+				for (int i = 0; i < item.attriNum; i++) {
+					outString += String.valueOf(item.attris[i])+" ";
+				}
+				outString += String.valueOf(item.cluster);
+				out.println(outString);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) {
