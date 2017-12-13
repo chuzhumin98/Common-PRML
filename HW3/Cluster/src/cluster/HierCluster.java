@@ -2,6 +2,7 @@ package cluster;
 
 import java.util.ArrayList;
 
+import file.FileIO;
 import file.PersonEntry;
 
 public class HierCluster {
@@ -44,11 +45,36 @@ public class HierCluster {
 	}
 	
 	
-	
 	/*
 	 * 将类别数将至C类，采用某种评价方式
 	 */
 	public void mergeCluster(int C, int standard) {
-		
+		while (clusters.size() > C) {
+			int i0 = -1, j0 = -1; //记录最可能merge的组合
+			double minDist = Double.MAX_VALUE;
+			for (int i = 0; i < this.clusters.size(); i++) {
+				for (int j = i+1; j < this.clusters.size(); j++) {
+					double myDist = this.getDistance(standard, this.clusters.get(i), this.clusters.get(j));
+					if (myDist < minDist) {
+						i0 = i;
+						j0 = j;
+					}
+				}
+			}
+			for (PersonEntry item: this.clusters.get(j0).peopleCluster) { //实现merge操作
+				this.clusters.get(i0).peopleCluster.add(item);
+			}
+			this.clusters.remove(j0);
+		}
+	}
+	
+	public static void main(String[] args) {
+		FileIO file = FileIO.getInstance();
+		HierCluster hc = new HierCluster(file.personPCA);
+		int C = 5;
+		hc.mergeCluster(C, 2);
+		for (int i = 0; i < C; i++) {
+			System.out.println(hc.clusters.get(i).peopleCluster.size());
+		}
 	}
 }
