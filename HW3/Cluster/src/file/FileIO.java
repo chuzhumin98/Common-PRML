@@ -157,7 +157,7 @@ public class FileIO {
 	 * 将聚类结果输出到output文件夹中
 	 * 输出格式：前attriNum列为更属性的值，最后一列为分类结果
 	 */
-	public static void outputCluster(ArrayList<PersonEntry> people, String path) {
+	public void outputCluster(ArrayList<PersonEntry> people, String path) {
 		try (PrintStream out = new PrintStream(new File("output/"+path))) {
 			for (PersonEntry item: people) {
 				String outString = "";

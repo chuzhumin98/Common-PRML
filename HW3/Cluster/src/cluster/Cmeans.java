@@ -7,6 +7,10 @@ import file.FileIO;
 import file.PersonEntry;
 
 public class Cmeans {
+	public double[][] clusterTotalVectors = new double [20][10]; 
+			//给一个足够大的数组用来各类均值向量
+	public int[] clusterNumber = new int [20]; //每一类的元素个数
+	
 	/*
 	 * 针对people进行类别数为C的聚类
 	 */
@@ -44,6 +48,7 @@ public class Cmeans {
 				item.cluster = minIndex;
 			}
 		}
+		
 	}
 	
 	/*
@@ -53,6 +58,35 @@ public class Cmeans {
 		for (int i = 0; i < people.size(); i++) {
 			people.get(i).cluster = -1;
 		}
+	}
+	
+	/*
+	 * 初始化各类的所有向量之和
+	 */
+	private void initTotalVector(ArrayList<PersonEntry> people, int C) {
+		/*
+		 * 首先要将向量进行初始化
+		 */
+		int attriNum = people.get(0).attriNum;
+		for (int i = 0; i < C; i++) {
+			for (int j = 0; j < attriNum; j++) {
+				this.clusterTotalVectors[i][j] = 0.0;
+			}
+		}
+		for (int i = 0; i < C; i++) {
+			this.clusterNumber[i] = 0;
+		}
+		/*
+		 * 在此基础上进行计数
+		 */
+		for (PersonEntry item: people) {
+			int index = item.cluster;
+			this.clusterNumber[index]++;
+			for (int k = 0; k < attriNum; k++) {
+				this.clusterTotalVectors[index][k] += item.attris[k];
+			}
+		}
+		
 	}
 	
 	public static void main(String[] args) {
