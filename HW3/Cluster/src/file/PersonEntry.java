@@ -38,4 +38,16 @@ public class PersonEntry {
 		}
 		return sums;
 	}
+	
+	/*
+	 * 获得和某个向量之间的距离(采用传统的欧式距离)
+	 */
+	public double getDistance(double[] other) {
+		double sums = 0.0;
+		for (int i = 0; i < this.attriNum; i++) {
+			double delta = this.attris[i] - other[i];
+			sums += delta * delta;
+		}
+		return sums;
+	}
 }

@@ -9,7 +9,10 @@ import file.PersonEntry;
 public class Cmeans {
 	public double[][] clusterTotalVectors = new double [20][10]; 
 			//给一个足够大的数组用来各类均值向量
+	public double[][] clusterMVectors = new double [20][10]; //对应的m向量
 	public int[] clusterNumber = new int [20]; //每一类的元素个数
+	public static final int MAX_ITER = 100000; //最大迭代次数
+	public static final int STOP_N = 20; //N步不变判停准则
 	
 	/*
 	 * 针对people进行类别数为C的聚类
@@ -22,6 +25,7 @@ public class Cmeans {
 		/*
 		 * 步骤1，初始划分c个聚类
 		 */
+		int attriNum = people.get(0).attriNum;
 		int[] indexes = new int [C]; //记录下来C类的代表点下标
 		this.resetCluster(people);
 		for (int i = 0; i < C; ) {
@@ -49,6 +53,46 @@ public class Cmeans {
 			}
 		}
 		
+		this.initTotalVector(people, C);
+		/*
+		 * 步骤2：迭代调整
+		 */
+		int size = people.size();
+		for (int i = 0; i < Cmeans.MAX_ITER; i++) {
+			Random random = new Random();
+			int index = random.nextInt(size);
+			PersonEntry person = people.get(index);
+			int i0 = person.cluster;
+			if (this.clusterNumber[i0] == 1) continue; //某一类中只有一个元素时，跳过该轮
+			int j0 = -1;
+			double roujmin = Double.MAX_VALUE;
+			for (int j = 0; j < C; j++) {
+				if (j == i0) continue;
+				double rouj = (double)this.clusterNumber[j]*
+						person.getDistance(this.clusterMVectors[j])/(double)(this.clusterNumber[j]+1);
+				if (rouj < roujmin) {
+					roujmin = rouj;
+					j0 = j;
+				}
+			}
+			double roui0 = (double)this.clusterNumber[i0]*
+					person.getDistance(this.clusterMVectors[i0])/(double)(this.clusterNumber[i0]-1);
+			if (roui0 > roujmin) { //当需要改变时，则发生改变
+				person.cluster = j0;
+				this.clusterNumber[i0]--;
+				this.clusterNumber[j0]++;
+				for (int j = 0; j < attriNum; j++) {
+					this.clusterTotalVectors[i0][j] -= person.attris[j];
+					this.clusterMVectors[i0][j] = this.clusterTotalVectors[i0][j] / (double)this.clusterNumber[i0];
+					this.clusterTotalVectors[j0][j] += person.attris[j];
+					this.clusterMVectors[j0][j] = this.clusterTotalVectors[j0][j] / (double)this.clusterNumber[j0];
+				}
+			}
+			if ((i+1)%1000 == 0) {
+				System.out.println("iter "+(i+1)+":"+this.getJe(people, C));
+			}
+		}
+		
 	}
 	
 	/*
@@ -71,6 +115,7 @@ public class Cmeans {
 		for (int i = 0; i < C; i++) {
 			for (int j = 0; j < attriNum; j++) {
 				this.clusterTotalVectors[i][j] = 0.0;
+				this.clusterMVectors[i][j] = 0.0;
 			}
 		}
 		for (int i = 0; i < C; i++) {
@@ -86,13 +131,29 @@ public class Cmeans {
 				this.clusterTotalVectors[index][k] += item.attris[k];
 			}
 		}
+		for (int i = 0; i < C; i++) {
+			for (int j = 0; j < attriNum; j++) {
+				this.clusterMVectors[i][j] = this.clusterTotalVectors[i][j] / (double)this.clusterNumber[i];
+			}
+		}
 		
+	}
+	
+	/*
+	 * 计算聚类平方和聚类准则
+	 */
+	public double getJe(ArrayList<PersonEntry> people, int C) {
+		double Je = 0.0;
+		for (PersonEntry item: people) {
+			Je += item.getDistance(this.clusterMVectors[item.cluster]);
+		}
+		return Je;
 	}
 	
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
 		Cmeans cm = new Cmeans();
-		cm.doCmeans(file.personInital, 8);
+		cm.doCmeans(file.personInital, 6);
 		file.outputCluster(file.personInital, "testPut.txt");
 	}
 }
