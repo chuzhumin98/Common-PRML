@@ -1,5 +1,8 @@
 package cluster;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,6 +16,15 @@ public class Cmeans {
 	public int[] clusterNumber = new int [20]; //每一类的元素个数
 	public static final int MAX_ITER = 100000; //最大迭代次数
 	public static final int STOP_N = 20; //N步不变判停准则
+	public int SPLIT_NUM = 10; //每十轮关注一次值的变化
+	public int matrixColumn;
+	public double[][] matrixJe; //不同C迭代不同次数后的表单
+	private boolean needWritten = false; //是否需要书写表单
+	
+	Cmeans() {
+		matrixColumn = MAX_ITER / SPLIT_NUM;
+		matrixJe = new double [6][this.matrixColumn];
+	}
 	
 	/*
 	 * 针对people进行类别数为C的聚类
@@ -89,7 +101,11 @@ public class Cmeans {
 				}
 			}
 			if ((i+1)%1000 == 0) {
-				System.out.println("iter "+(i+1)+":"+this.getJe(people, C));
+				//System.out.println("iter "+(i+1)+":"+this.getJe(people, C));
+			}
+			if (i % SPLIT_NUM == 0 && this.needWritten) {
+				int indexWriten = i / SPLIT_NUM;
+				this.matrixJe[C-1][indexWriten] = this.getJe(people, C);
 			}
 		}
 		
@@ -150,12 +166,40 @@ public class Cmeans {
 		return Je;
 	}
 	
+	/*
+	 * 将不同C的Je变化曲线写入文件中
+	 */
+	public void writtenJeCurve(String path, ArrayList<PersonEntry> people) {
+		this.needWritten = true; //置为可以书写
+		for (int i = 1; i <= 6; i++) {
+			this.doCmeans(people, i);
+		}
+		try (PrintStream out = new PrintStream(new File("output/"+path))) {
+			for (int i = 0; i < 6; i++) {
+				String string = "";
+				for (int j = 0; j < this.matrixColumn; j++) {
+					if (j != this.matrixColumn-1) {
+						string += this.matrixJe[i][j]+" ";
+					} else {
+						string += this.matrixJe[i][j];
+					}
+				}
+				out.println(string);
+			}
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.needWritten = false;
+	}
+	
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
 		Cmeans cm = new Cmeans();
-		int C = 2;
+		cm.writtenJeCurve("CmeansiPCACurve", file.personPCA);
+		/*int C = 6;
 		cm.doCmeans(file.personPCA, C);
 		String outfile = "CmeansPCAC="+C+".txt";
-		file.outputCluster(file.personPCA, outfile);
+		file.outputCluster(file.personPCA, outfile); */
 	}
 }
