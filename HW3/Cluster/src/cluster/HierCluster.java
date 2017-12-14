@@ -1,5 +1,8 @@
 package cluster;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import file.FileIO;
@@ -58,9 +61,11 @@ public class HierCluster {
 					if (myDist < minDist) {
 						i0 = i;
 						j0 = j;
+						minDist = myDist;
 					}
 				}
 			}
+			System.out.println(clusters.size()+":"+i0+" "+j0);
 			for (PersonEntry item: this.clusters.get(j0).peopleCluster) { //实现merge操作
 				this.clusters.get(i0).peopleCluster.add(item);
 			}
@@ -68,13 +73,36 @@ public class HierCluster {
 		}
 	}
 	
+	/*
+	 * 将聚类结果输出到output文件夹中
+	 * 输出格式：前attriNum列为更属性的值，最后一列为分类结果
+	 */
+	public void outputCluster(String path) {
+		try (PrintStream out = new PrintStream(new File("output/"+path))) {
+			for (int i = 0; i < this.clusters.size(); i++) {
+				Cluster item = this.clusters.get(i);
+				for (PersonEntry items: item.peopleCluster) {
+					String outString = "";
+					for (int j = 0; j < items.attriNum; j++) {
+						outString += String.valueOf(items.attris[j])+" ";
+					}
+					outString += String.valueOf(i);
+					out.println(outString);
+				}
+			}	
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
-		HierCluster hc = new HierCluster(file.personPCA);
-		int C = 5;
-		hc.mergeCluster(C, 1);
-		for (int i = 0; i < C; i++) {
-			System.out.println(hc.clusters.get(i).peopleCluster.size());
+		HierCluster hc = new HierCluster(file.personInital);
+		for (int C = 6; C >= 1; C--) {
+			hc.mergeCluster(C, 1);
+			String path = "initialC="+C+"hiercompletelink.txt";
+			hc.outputCluster(path);
 		}
 	}
 }
