@@ -18,6 +18,7 @@ public class FileIO {
 	public ArrayList<PersonEntry> personPCA = new ArrayList<PersonEntry>(); //存储PCA变换之后的特征
 	public Matrix sigma = null; //协方差矩阵
 	public double[] mu = null; //均值mu向量 
+	public boolean needWrittenEigenValue = true; //需要将各特征值写入文件中
 	
 	public static FileIO file = null;
 	/*
@@ -98,6 +99,19 @@ public class FileIO {
 		EigenvalueDecomposition eigens = this.sigma.eig();
 		Matrix eigenVector = eigens.getV();
 		double[] eigenValue = eigens.getRealEigenvalues();
+		/*
+		 * 将特征值写入文件中
+		 */
+		if (this.needWrittenEigenValue) {
+			try (PrintStream out = new PrintStream(new File("output/eigenvalue.txt"))) {
+				for (int i = 0; i < eigenValue.length; i++) {
+					out.println(eigenValue[eigenValue.length - 1 - i]);
+				}
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		
 		/*
 		 * 输出eigenvalue

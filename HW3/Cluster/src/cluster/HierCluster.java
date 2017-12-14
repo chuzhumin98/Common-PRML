@@ -98,10 +98,10 @@ public class HierCluster {
 	
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
-		HierCluster hc = new HierCluster(file.personInital);
+		HierCluster hc = new HierCluster(file.personPCA);
 		for (int C = 6; C >= 1; C--) {
-			hc.mergeCluster(C, 1);
-			String path = "initialC="+C+"hiercompletelink.txt";
+			hc.mergeCluster(C, 2);
+			String path = "PCAC="+C+"hieraveragelink.txt";
 			hc.outputCluster(path);
 		}
 	}
