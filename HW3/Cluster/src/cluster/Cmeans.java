@@ -153,7 +153,9 @@ public class Cmeans {
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
 		Cmeans cm = new Cmeans();
-		cm.doCmeans(file.personInital, 6);
-		//file.outputCluster(file.personInital, "testPut.txt");
+		int C = 2;
+		cm.doCmeans(file.personPCA, C);
+		String outfile = "CmeansPCAC="+C+".txt";
+		file.outputCluster(file.personPCA, outfile);
 	}
 }

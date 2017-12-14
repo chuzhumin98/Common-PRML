@@ -72,7 +72,7 @@ public class HierCluster {
 		FileIO file = FileIO.getInstance();
 		HierCluster hc = new HierCluster(file.personPCA);
 		int C = 5;
-		hc.mergeCluster(C, 2);
+		hc.mergeCluster(C, 1);
 		for (int i = 0; i < C; i++) {
 			System.out.println(hc.clusters.get(i).peopleCluster.size());
 		}
