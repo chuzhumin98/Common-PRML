@@ -10,6 +10,8 @@ import file.PersonEntry;
 
 public class HierCluster {
 	public ArrayList<Cluster> clusters = new ArrayList<Cluster>();
+	public int sampleSize;
+	public double[] mergeDist = null;
 	
 	/*
 	 * 构造函数选定聚类的对象们
@@ -20,6 +22,8 @@ public class HierCluster {
 			myItem.peopleCluster.add(item);
 			clusters.add(myItem);
 		}
+		this.sampleSize = people.size();
+		this.mergeDist = new double [this.sampleSize]; //index 为i表示从i+1降至i过程中的merge距离
 	}
 	
 	/*
@@ -65,6 +69,7 @@ public class HierCluster {
 					}
 				}
 			}
+			this.mergeDist[this.clusters.size()-1] = minDist;
 			System.out.println(clusters.size()+":"+i0+" "+j0);
 			for (PersonEntry item: this.clusters.get(j0).peopleCluster) { //实现merge操作
 				this.clusters.get(i0).peopleCluster.add(item);
@@ -96,13 +101,26 @@ public class HierCluster {
 		}
 	}
 	
+	public void outputDistanceCurve(String path) {
+		try (PrintStream out = new PrintStream(new File("output/"+path))) {
+			for (int i = 1; i < this.sampleSize; i++) {
+				out.println(this.mergeDist[this.sampleSize-i]);
+			}	
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	public static void main(String[] args) {
 		FileIO file = FileIO.getInstance();
-		HierCluster hc = new HierCluster(file.personPCA);
-		for (int C = 6; C >= 1; C--) {
+		HierCluster hc = new HierCluster(file.personInital);
+		/*for (int C = 6; C >= 1; C--) {
 			hc.mergeCluster(C, 2);
 			String path = "PCAC="+C+"hieraveragelink.txt";
 			hc.outputCluster(path);
-		}
+		} */
+		hc.mergeCluster(1, 0);
+		hc.outputDistanceCurve("initialhierdistsinglelink.txt");
 	}
 }
